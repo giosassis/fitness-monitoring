@@ -1,0 +1,127 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Address {
+  address_id   Int       @id @default(autoincrement())
+  street       String
+  city         String
+  state        String
+  postal_code  String
+  house_number String
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  user         User?
+  personal     Personal?
+}
+
+model User {
+  user_id           Int              @id @default(autoincrement())
+  name              String
+  username          String
+  email             String           @unique
+  password          String
+  weight            Float
+  height            Float
+  age               Int
+  habits            String
+  birthdate         DateTime
+  imc               Float?
+  bodyFatPercentage Float?
+  created_at        DateTime         @default(now())
+  updated_at        DateTime         @updatedAt
+  address           Address          @relation(fields: [addressId], references: [address_id])
+  addressId         Int              @unique
+  TrainingSeries    TrainingSeries[]
+}
+
+model Personal {
+  personal_id    Int              @id @default(autoincrement())
+  name           String
+  email          String           @unique
+  password       String
+  cref           String
+  description    String?
+  created_at     DateTime         @default(now())
+  updated_at     DateTime         @updatedAt
+  address        Address?         @relation(fields: [addressId], references: [address_id])
+  addressId      Int?             @unique
+  TrainingSeries TrainingSeries[]
+}
+
+model Exercise {
+  id              Int              @id @default(autoincrement())
+  name            String
+  description     String?
+  muscle          Muscle           @relation(fields: [muscleId], references: [id])
+  muscleId        Int
+  category        ExerciseCategory @relation(fields: [categoryId], references: [id])
+  categoryId      Int
+  equipment       Equipment?       @relation(fields: [equipmentId], references: [id])
+  equipmentId     Int?
+  exercise_image  ExerciseImage?   @relation(fields: [exerciseImageId], references: [id])
+  exerciseImageId Int?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  trainingSeries  TrainingSeries[] @relation("TrainingSeriesExercises")
+}
+
+model Equipment {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  Exercise    Exercise[]
+}
+
+model Muscle {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  Exercise    Exercise[]
+}
+
+model ExerciseCategory {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  Exercise    Exercise[]
+}
+
+model ExerciseImage {
+  id        Int        @id @default(autoincrement())
+  imageUrl  String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  Exercise  Exercise[]
+}
+
+model TrainingSeries {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  personalId  Int
+  name        String
+  description String
+  series      Int
+  repetitions Int
+  restTime    Float?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  user      User       @relation(fields: [userId], references: [user_id])
+  personal  Personal   @relation(fields: [personalId], references: [personal_id])
+  exercises Exercise[] @relation("TrainingSeriesExercises")
+}
