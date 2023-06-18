@@ -125,3 +125,4 @@ model TrainingSeries {
   personal  Personal   @relation(fields: [personalId], references: [personal_id])
   exercises Exercise[] @relation("TrainingSeriesExercises")
 }
+

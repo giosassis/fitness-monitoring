@@ -1,7 +1,11 @@
-const env = require('dotenv').config
 const Koa = require('koa');
+const bodyParser = require('koa-bodyparser');
+const router = require('./routes/routes');
 
 const app = new Koa();
+
+app.use(bodyParser());
+app.use(router.routes());
 
 // Rota inicial de teste
 app.use(async (ctx) => {
